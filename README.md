@@ -1,20 +1,7 @@
 # Repositorio de Tareas IIC2613
-$name
-$username
-$user
-$TEST_CLASSROOM_STUDENT_GITHUB_ID
-TEST_CLASSROOM_STUDENT_GITHUB_ID
-$user_id
-user_id
 
-:name
-:username
-:user
-:TEST_CLASSROOM_STUDENT_GITHUB_ID
-_TEST_CLASSROOM_STUDENT_GITHUB_ID
-:user_id
-
-
+### Nombre: Benjamín Farías Valdés
+### Usuario de Github: BFFV
 
 Este es el repositorio que utilizarás durante el curso. Tanto profesores como ayudantes tenemos acceso a este y podremos ver todos los cambios que hagas en tu código. **Es tu deber darle un buen uso y solo con fines académicos.**
 
