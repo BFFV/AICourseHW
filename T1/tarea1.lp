@@ -69,10 +69,8 @@ partida(C, Y, X) :- color(C, Y, X), not meta(C, Y, X).
 :- camino(C, Y, X, B, A), meta(C, Y, X).
 
 % Un camino no puede aparecer de la nada, debe estar conectado al resto
-alcanzable(C, Y, X, B, A) :- camino(C, Y, X, B, A).
-alcanzable(C, Y, X, B, A) :- camino(C, Y, X, K, J), alcanzable(C, K, J, B, A).
 conectado(C, B, A) :- partida(C, B, A).
-conectado(C, B, A) :- alcanzable(C, Y, X, B, A), partida(C, Y, X).
+conectado(C, B, A) :- camino(C, Y, X, B, A), conectado(C, Y, X).
 :- camino(C, B, A, Y, X), not conectado(C, B, A).
 
 % Se deben usar todas las casillas
@@ -82,17 +80,9 @@ pintada(Y, X) :- conectado(C, Y, X).
 % No se pueden cruzar los caminos
 :- camino(C, Y, X, B, A), camino(O, K, J, B, A), X != J.
 :- camino(C, Y, X, B, A), camino(O, K, J, B, A), Y != K.
-:- camino(C, Y, X, B, A), camino(O, Y, X, B, A), C != O.
 
-% Una casilla no puede tener más de 1 camino de salida
-:- camino(C, Y, X, B, A), camino(O, Y, X, K, J), A != J.
-:- camino(C, Y, X, B, A), camino(O, Y, X, K, J), B != K.
-
-% No se puede formar un camino con un punto de partida
-:- camino(C, Y, X, B, A), partida(O, B, A).
-
-% No se puede formar un camino con una meta de color distinto
-:- camino(C, Y, X, B, A), meta(O, B, A), C != O.
+% No se puede formar un camino con un punto de partida o una meta de color distinto
+:- camino(C, Y, X, B, A), color(O, B, A), not meta(C, B, A).
 
 % No se puede retroceder
 :- camino(C, Y, X, B, A), camino(C, B, A, Y, X).
