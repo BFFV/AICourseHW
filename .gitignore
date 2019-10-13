@@ -22,3 +22,8 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# T2
+T2/*
+!T2/README.md
+!T2/solution.py
