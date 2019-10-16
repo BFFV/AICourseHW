@@ -41,6 +41,38 @@ def sliders_h_alternate(state):
     '''OUTPUT: a numeric value that serves as an estimate of the distance of the state to the goal.'''
 
     slide_mh = 0
+    for row in range(state.height):
+        for col in range(state.width):
+            number = state.tiles[row][col]
+            x = number % state.width
+            y = number // state.width
+            x_distance = abs(x - col)
+            y_distance = abs(y - row)
+            x_delta = min(x_distance, state.width - x_distance)
+            y_delta = min(y_distance, state.height - y_distance)
+            slide_mh += x_delta + y_delta
+    return slide_mh / (state.height * state.width)
+
+
+def sliders_h_max(state):
+    # Another heuristic, used for comparison between the algorithms
+    mh_distances = deque()
+    for row in range(state.height):
+        for col in range(state.width):
+            number = state.tiles[row][col]
+            x = number % state.width
+            y = number // state.width
+            x_distance = abs(x - col)
+            y_distance = abs(y - row)
+            x_delta = min(x_distance, state.width - x_distance)
+            y_delta = min(y_distance, state.height - y_distance)
+            mh_distances.append(x_delta + y_delta)
+    return max(mh_distances)
+
+
+def sliders_h_avg(state):
+    # Another heuristic, used for comparison between the algorithms
+    slide_mh = 0
     incorrect = 0
     for row in range(state.height):
         for col in range(state.width):
@@ -179,14 +211,14 @@ if __name__ == "__main__":
     print("===================================================")
 
     print("=========Test 3. Anytime Weighted Astar with h_alternate heuristic========")
-    weight = 10
+    weight = 12
     final = anytime_weighted_astar(s0, heur_fn=sliders_h_alternate,
-                                      weight=weight, timebound=20)
+                                   weight=weight, timebound=20)
     if final: final.print_path()
     print("===================================================")
 
     print("=========Test 4. Restarting Weighted Astar with h_alternate heuristic========")
-    weight = 10
+    weight = 12
     final = restarting_weighted_astar(s0, heur_fn=sliders_h_alternate,
                                       weight=weight, timebound=20)
     if final: final.print_path()
@@ -206,6 +238,7 @@ if __name__ == "__main__":
 
     print("=========Demo 3. Weighted Astar with h_basic heuristic========")
     weight = 10
-    final = weighted_astar(s0, heur_fn=sliders_h_basic, weight=weight, timebound=20)
+    final = weighted_astar(
+        s0, heur_fn=sliders_h_basic, weight=weight, timebound=20)
     if final: final.print_path()
     print("===================================================")
