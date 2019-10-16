@@ -17,6 +17,7 @@ from problems import *
 def sliders_h_zero(state):
     return 0
 
+
 def sliders_h_basic(state):
     sum_in_width = 0
     sum_in_height = 0
@@ -38,8 +39,23 @@ def sliders_h_alternate(state):
     '''a better heuristic'''
     '''INPUT: a sliders state'''
     '''OUTPUT: a numeric value that serves as an estimate of the distance of the state to the goal.'''
-    #Write a heuristic function that improves upon h_basic to estimate distance between the current state and the goal.
-    #Your function should return a numeric value for the estimate of the distance to the goal.
+
+    slide_mh = 0
+    incorrect = 0
+    for row in range(state.height):
+        for col in range(state.width):
+            number = state.tiles[row][col]
+            x = number % state.width
+            y = number // state.width
+            x_distance = abs(x - col)
+            y_distance = abs(y - row)
+            if x_distance + y_distance:
+                incorrect += 1
+            x_delta = min(x_distance, state.width - x_distance)
+            y_delta = min(y_distance, state.height - y_distance)
+            slide_mh += x_delta + y_delta
+    if incorrect:
+        return slide_mh / incorrect
     return 0
 
 
@@ -62,6 +78,7 @@ def fval_function(sN, weight):
     #print(sN.gval, sN.hval, sN.gval + weight*sN.hval )
     return sN.gval + weight*sN.hval
 
+
 def weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
     '''Provides an implementation of weighted a-star'''
     '''INPUT: a sliders state that represents the start state and a timebound (number of seconds)'''
@@ -75,28 +92,62 @@ def weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
 
     if result:
         return result
-    else :
+    else:
         return False
 
 
 def anytime_weighted_astar(initial_state, heur_fn, weight=1., timebound = 10):
-#IMPLEMENT
-#----------------------------------------------
-  '''Provides an implementation of anytime weighted a-star (AWA*), as described in the Homework'''
-  '''INPUT: a sliders state that represents the start state and a timebound (number of seconds)'''
-  '''OUTPUT: A goal state (if a goal is found), else False'''
-  '''implementation of weighted astar algorithm'''
-  return False
+    #IMPLEMENT
+    #----------------------------------------------
+    '''Provides an implementation of anytime weighted a-star (AWA*), as described in the Homework'''
+    '''INPUT: a sliders state that represents the start state and a timebound (number of seconds)'''
+    '''OUTPUT: A goal state (if a goal is found), else False'''
+    '''implementation of anytime weighted astar algorithm'''
+
+    awa_se = SearchEngine('custom', 'full')
+    awa_se.trace_on(0)
+    awa_se.init_search(initial_state, sliders_goal_state, heur_fn,
+                       (lambda sN: fval_function(sN, weight)))
+    result = awa_se.search(timebound=timebound)
+    current_solution = result
+    while result:
+        result = awa_se._searchOpen(
+            sliders_goal_state, heur_fn,
+            (lambda sN: fval_function(sN, weight)),
+            [float('inf'), float('inf'), current_solution.gval])
+        if result:
+            current_solution = result.state
+    result = current_solution
+    return result
+
 
 def restarting_weighted_astar(initial_state, heur_fn, weight=1., phi=0.8, timebound = 10):
-#IMPLEMENT
-#----------------------------------------------
-  '''Provides an implementation of RWA*, as described in the homework'''
-  '''INPUT: a sliders state that represents the start state, an heuristic function, an initial weight, a phi parameter and a timebound (number of seconds)'''
-  '''OUTPUT: A goal state (if a goal is found), else False'''
-  '''implementation of weighted astar algorithm'''
-  return False
+    #IMPLEMENT
+    #----------------------------------------------
+    '''Provides an implementation of RWA*, as described in the homework'''
+    '''INPUT: a sliders state that represents the start state, an heuristic function, an initial weight, a phi parameter and a timebound (number of seconds)'''
+    '''OUTPUT: A goal state (if a goal is found), else False'''
+    '''implementation of restarting weighted astar algorithm'''
 
+    current_weight = weight
+    rwa_se = SearchEngine('custom', 'full')
+    rwa_se.trace_on(0)
+    rwa_se.init_search(initial_state, sliders_goal_state, heur_fn,
+                       (lambda sN: fval_function(sN, current_weight)))
+    result = rwa_se.search(timebound=timebound)
+    current_solution = result
+    while result and (current_weight > 1):
+        current_weight = max(1, phi * current_weight)
+        timebound -= (os.times()[0] - rwa_se.search_start_time)
+        rwa_se.init_search(initial_state, sliders_goal_state, heur_fn,
+                           (lambda sN: fval_function(sN, current_weight)))
+        result = rwa_se.search(
+            timebound=timebound,
+            costbound=[float('inf'), float('inf'), current_solution.gval])
+        if result:
+            current_solution = result
+    result = current_solution
+    return result
 
 
 if __name__ == "__main__":
@@ -110,6 +161,36 @@ if __name__ == "__main__":
     #se.trace_on(2)
 
     s0 = PROBLEMS[7]
+    s_easy = PROBLEMS[2]
+    s_mid = PROBLEMS[6]
+    s_hard = PROBLEMS[10]
+
+    print("=========Test 1. Astar with h_alternate heuristic========")
+    se.init_search(s0, sliders_goal_state, sliders_h_alternate)
+    final = se.search(timebound=20)
+    if final: final.print_path()
+    print("===================================================")
+
+    print("=========Test 2. Weighted Astar with h_alternate heuristic========")
+    weight = 10
+    final = weighted_astar(s0, heur_fn=sliders_h_alternate, weight=weight,
+                           timebound=20)
+    if final: final.print_path()
+    print("===================================================")
+
+    print("=========Test 3. Anytime Weighted Astar with h_alternate heuristic========")
+    weight = 10
+    final = anytime_weighted_astar(s0, heur_fn=sliders_h_alternate,
+                                      weight=weight, timebound=20)
+    if final: final.print_path()
+    print("===================================================")
+
+    print("=========Test 4. Restarting Weighted Astar with h_alternate heuristic========")
+    weight = 10
+    final = restarting_weighted_astar(s0, heur_fn=sliders_h_alternate,
+                                      weight=weight, timebound=20)
+    if final: final.print_path()
+    print("===================================================")
 
     print("=========Demo 1. Astar with h_zero heuristic========")
     se.init_search(s0, sliders_goal_state, sliders_h_zero)
@@ -128,6 +209,3 @@ if __name__ == "__main__":
     final = weighted_astar(s0, heur_fn=sliders_h_basic, weight=weight, timebound=20)
     if final: final.print_path()
     print("===================================================")
- 
-
-
