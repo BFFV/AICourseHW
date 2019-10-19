@@ -29,4 +29,11 @@ Se crearon 3 heurísticas alternativas a la básica propuesta, la principal que 
 
 - Tiempo de Búsqueda: El algoritmo `Anytime Weighted A*` logró encontrar rápidamente varias soluciones en sus posteriores iteraciones, aprovechando que ya tenía las listas OPEN y CLOSED bastante desarrolladas. Por otro lado, el algoritmo `Restarting Weighted A*` tardaba más tiempo en encontrar más soluciones, debido a que tenía que volver a expandir muchos nodos nuevamente al volver a ejecutar `Weighted A*` desde 0.
 
+En la siguiente tabla se muestran los resultados obtenidos utilizando la heurística básica propuesta y la alternativa indicada al comienzo de este reporte, probando ambos algoritmos con W=20 en el test case número 7 (s0) (el tiempo está en segundos):
+
+| Algoritmo    | Costo (h_basic) | Tiempo (h_basic) | Costo (h_alternate) | Tiempo (h_alternate) |
+|--------------|-----------------|------------------|---------------------|----------------------|
+| AWA* (W=20)  | 7               | 360              | 8                   | 15                   |
+| RWA* (W=20)  | 7               | 360              | 7                   | 15                   |
+
 Como conclusión, si se necesitan realizar AJUSTES de soluciones encontradas en POCO tiempo, es recomendable utilizar `Anytime Weighted A*`. En el caso de que se requieran soluciones enfocadas en MEJORAR considerablemente la optimalidad, es mejor utilizar `Restarting Weighted A*`.
