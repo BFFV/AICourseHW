@@ -153,3 +153,8 @@ dmypy.json
 T2/*
 !T2/README.md
 !T2/solution.py
+
+# T3
+T3/*
+!T3/README.md
+!T3/Tarea3.ipynb
